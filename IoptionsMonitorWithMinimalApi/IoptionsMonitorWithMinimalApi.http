@@ -1,0 +1,6 @@
+@IoptionsMonitorWithMinimalApi_HostAddress = http://localhost:5192
+
+GET {{IoptionsMonitorWithMinimalApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
