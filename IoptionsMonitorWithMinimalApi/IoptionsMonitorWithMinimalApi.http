@@ -4,3 +4,7 @@ GET {{IoptionsMonitorWithMinimalApi_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+GET {{IoptionsMonitorWithMinimalApi_HostAddress}}/reload-config/
+Accept: application/json
+
+###

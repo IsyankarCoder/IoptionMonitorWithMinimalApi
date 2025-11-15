@@ -2,31 +2,21 @@ using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-builder.Services.Configure<SmtpSettings>(
-     builder.Configuration.GetSection(SmtpSettings.SectionName)
-     
-);
-//builder.Services.AddScoped<EmailService>();
-//builder.Services.AddScoped<EmailServiceWithIOptionSnapShot>();
-builder.Services.AddTransient<EmailServiceIoptionMonitor>();
-
-// Kayıtlı servisleri logla (debug amaçlı)
-int emailServiceMonitorRegistrationCount = 0;
-foreach (var sd in builder.Services)
+// Override configuration sources for testing (disable reloadOnChange)
+builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
 {
-    if (sd.ServiceType == typeof(EmailServiceIoptionMonitor))
-    {
-        emailServiceMonitorRegistrationCount++;
-    }
-}
+    config.Sources.Clear();
+    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+    config.AddEnvironmentVariables();
+});
 
-Console.WriteLine($"EmailServiceIoptionMonitor kayitli sayisi: {emailServiceMonitorRegistrationCount}");
+builder.Services.AddOpenApi();
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection(SmtpSettings.SectionName));
+builder.Services.AddSingleton<EmailServiceIoptionMonitor>();
+
+Console.WriteLine($"EmailServiceIoptionMonitor kayitli sayisi: {builder.Services.Count(sd => sd.ServiceType == typeof(EmailServiceIoptionMonitor))}");
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -34,36 +24,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapGet("/weatherforecast", (EmailServiceIoptionMonitor svc) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    svc.SendEmail("a@b.com","o","b");
+    return new[] { "ok" };
+});
 
-app.MapGet("/weatherforecast", (//[FromServices] EmailService emailService,
-                                               //EmailServiceWithIOptionSnapShot emailServiceWithIOptionSnapShot,
-                                               EmailServiceIoptionMonitor emailServiceIoptionMonitor
-                                               ) =>
+// Test amaçlı: çalışırken config'i elle reload eden endpoint (opsiyonel)
+app.MapGet("/reload-config", (IConfiguration configuration) =>
 {
-      
-   // emailService.SendEmail("code.bafra.55@gmail.com","test","test body");
-    // emailServiceWithIOptionSnapShot.SendEmail("code.bafra.55@gmail.com","test","test body");
-emailServiceIoptionMonitor.SendEmail("code.bafra.55@gmail.com","test","test body");
-
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
+    if (configuration is IConfigurationRoot root)
+    {
+        root.Reload();
+        return Results.Ok("Configuration reloaded");
+    }
+    return Results.Problem("Cannot cast to IConfigurationRoot");
+});
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

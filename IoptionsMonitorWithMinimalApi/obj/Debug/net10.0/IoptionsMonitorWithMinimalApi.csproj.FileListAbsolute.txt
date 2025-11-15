@@ -31,3 +31,4 @@ C:\Repo\NETCORE\API\IoptionMonitorWithMinimalApi\IoptionsMonitorWithMinimalApi\o
 C:\Repo\NETCORE\API\IoptionMonitorWithMinimalApi\IoptionsMonitorWithMinimalApi\obj\Debug\net10.0\IoptionsMonitorWithMinimalApi.pdb
 C:\Repo\NETCORE\API\IoptionMonitorWithMinimalApi\IoptionsMonitorWithMinimalApi\obj\Debug\net10.0\IoptionsMonitorWithMinimalApi.genruntimeconfig.cache
 C:\Repo\NETCORE\API\IoptionMonitorWithMinimalApi\IoptionsMonitorWithMinimalApi\obj\Debug\net10.0\ref\IoptionsMonitorWithMinimalApi.dll
+C:\Repo\NETCORE\API\IoptionMonitorWithMinimalApi\IoptionsMonitorWithMinimalApi\obj\Debug\net10.0\IoptionsMonitorWithMinimalApi.sourcelink.json
